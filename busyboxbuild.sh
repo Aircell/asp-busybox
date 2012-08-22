@@ -12,6 +12,7 @@ if ![ $(which arm-none-linux-gnueabi-gcc) ]; then
     If you install them in another place, or use other tools,
     please put them in your PATH 
   "
+fi
 
 export PATH+=:$tools
 
