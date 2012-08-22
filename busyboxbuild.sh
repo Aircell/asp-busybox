@@ -25,5 +25,3 @@ make $makeargs defconfig
 sed -e 's/.*FEATURE_PREFER_APPLETS.*/CONFIG_FEATURE_PREFER_APPLETS=y/' -i .config
 sed -e 's/.*FEATURE_SH_STANDALONE.*/CONFIG_FEATURE_SH_STANDALONE=y/' -i .config
 make $makeargs
-/home/jsh/workspace/orr/codesourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-gcc-4.3.3
-/home/jsh/workspace/orr/codesourcery/Sourcery_G++_Lite/share/doc/arm-arm-none-linux-gnueabi/man/man1/arm-none-linux-gnueabi-gcc.1
