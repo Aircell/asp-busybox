@@ -19,10 +19,13 @@ export PATH+=:$tools
 # cleanliness is next to godliness
 git clean -dfx
 
-# The next commands are pulled right from the INSTALL instructions,
-# with arguments added to the make command line to force a cross-build
-makeargs='ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi-'
-make $makeargs defconfig
-sed -e 's/.*FEATURE_PREFER_APPLETS.*/CONFIG_FEATURE_PREFER_APPLETS=y/' -i .config
-sed -e 's/.*FEATURE_SH_STANDALONE.*/CONFIG_FEATURE_SH_STANDALONE=y/' -i .config
-make $makeargs
+# The next commands are pulled right from the INSTALL instructions.
+make defconfig
+perl -i -pe '
+  s/.*FEATURE_PREFER_APPLETS.*/CONFIG_FEATURE_PREFER_APPLETS=y/;
+  s/.*FEATURE_SH_STANDALONE.*/CONFIG_FEATURE_SH_STANDALONE=y/;
+  s/.*STATIC.*/CONFIG_STATIC=y/;
+  s/.*INSTALL_NO_USR.*/CONFIG_INSTALL_NO_USR=y/;
+  s/.*CROSS_COMPILER_PREFIX.*/CONFIG_CROSS_COMPILER_PREFIX="arm-none-linux-gnueabi-"/;
+' .config
+make
