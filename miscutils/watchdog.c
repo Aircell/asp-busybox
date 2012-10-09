@@ -23,9 +23,10 @@
 #include "linux/types.h" /* for __u32 */
 #include "linux/watchdog.h"
 
-#define OPT_FOREGROUND  (1 << 0)
-#define OPT_STIMER      (1 << 1)
-#define OPT_HTIMER      (1 << 2)
+#define OPT_DELAY		(1 << 0)
+#define OPT_FOREGROUND  (1 << 1)
+#define OPT_STIMER      (1 << 2)
+#define OPT_HTIMER      (1 << 3)
 
 static void watchdog_shutdown(int sig UNUSED_PARAM)
 {
@@ -47,13 +48,15 @@ int watchdog_main(int argc, char **argv)
 	};
 
 	unsigned opts;
+	unsigned delay_duration; /* how long to wait before starting - sec */
 	unsigned stimer_duration; /* how often to restart */
-	unsigned htimer_duration = 60000; /* reboots after N ms if not restarted */
+	unsigned htimer_duration = 30; /* reboots after Ns if not restarted */
+	char *d_arg;
 	char *st_arg;
 	char *ht_arg;
 
 	opt_complementary = "=1"; /* must have exactly 1 argument */
-	opts = getopt32(argv, "Ft:T:", &st_arg, &ht_arg);
+	opts = getopt32(argv, "D:Ft:T:", &d_arg,&st_arg, &ht_arg);
 
 	/* We need to daemonize *before* opening the watchdog as many drivers
 	 * will only allow one process at a time to do so.  Since daemonizing
@@ -61,22 +64,27 @@ int watchdog_main(int argc, char **argv)
 	 * can't rely on parent exiting before us (let alone *cleanly* releasing
 	 * the watchdog fd -- something else that may not even be allowed).
 	 */
+
+	delay_duration = 0;
+	if ( opts & OPT_DELAY )
+		delay_duration = atoi(d_arg);
 	if (!(opts & OPT_FOREGROUND))
 		bb_daemonize_or_rexec(DAEMON_CHDIR_ROOT, argv);
-
 	if (opts & OPT_HTIMER)
-		htimer_duration = xatou_sfx(ht_arg, suffixes);
-	stimer_duration = htimer_duration / 2;
+		htimer_duration = atoi(ht_arg);
+	stimer_duration = htimer_duration / 4;
 	if (opts & OPT_STIMER)
-		stimer_duration = xatou_sfx(st_arg, suffixes);
+		stimer_duration = atoi(st_arg);
 
 	bb_signals(BB_FATAL_SIGS, watchdog_shutdown);
+
+	sleep(delay_duration);
 
 	/* Use known fd # - avoid needing global 'int fd' */
 	xmove_fd(xopen(argv[argc - 1], O_WRONLY), 3);
 
 	/* WDIOC_SETTIMEOUT takes seconds, not milliseconds */
-	htimer_duration = htimer_duration / 1000;
+	htimer_duration = htimer_duration;
 #ifndef WDIOC_SETTIMEOUT
 # error WDIOC_SETTIMEOUT is not defined, cannot compile watchdog applet
 #else
