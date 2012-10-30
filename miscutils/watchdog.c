@@ -31,8 +31,10 @@
 static void watchdog_shutdown(int sig UNUSED_PARAM)
 {
 	static const char V = 'V';
-
-	write(3, &V, 1);  /* Magic, see watchdog-api.txt in kernel */
+	int x = 1;
+	sync();
+	ioctl_or_warn(3, WDIOC_SETTIMEOUT, &x);
+	//write(3, &V, 1);  /* Magic, see watchdog-api.txt in kernel */
 	if (ENABLE_FEATURE_CLEAN_UP)
 		close(3);
 	_exit(EXIT_SUCCESS);
