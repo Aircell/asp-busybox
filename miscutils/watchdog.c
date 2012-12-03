@@ -28,11 +28,16 @@
 #define OPT_STIMER      (1 << 2)
 #define OPT_HTIMER      (1 << 3)
 
-static void watchdog_shutdown(int sig UNUSED_PARAM)
+static void watchdog_shutdown(int sig)
 {
 	static const char V = 'V';
-	int x = 1;
+	int x = 0;
+	if ( sig == SIGUSR1 )
+		x = 0;
+	else
+		x = 1;
 	sync();
+	sleep(5);
 	ioctl_or_warn(3, WDIOC_SETTIMEOUT, &x);
 	//write(3, &V, 1);  /* Magic, see watchdog-api.txt in kernel */
 	if (ENABLE_FEATURE_CLEAN_UP)
