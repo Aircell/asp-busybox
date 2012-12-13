@@ -30,7 +30,6 @@
 
 static void watchdog_shutdown(int sig)
 {
-	static const char V = 'V';
 	int x = 0;
 	if ( sig == SIGUSR1 )
 		x = 0;
@@ -48,12 +47,6 @@ static void watchdog_shutdown(int sig)
 int watchdog_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int watchdog_main(int argc, char **argv)
 {
-	static const struct suffix_mult suffixes[] = {
-		{ "ms", 1 },
-		{ "", 1000 },
-		{ "", 0 }
-	};
-
 	unsigned opts;
 	unsigned delay_duration; /* how long to wait before starting - sec */
 	unsigned stimer_duration; /* how often to restart */
@@ -116,7 +109,7 @@ int watchdog_main(int argc, char **argv)
 		 * as the counter value is undefined at this point -- PFM
 		 */
 		write(3, "", 1); /* write zero byte */
-		usleep(stimer_duration * 1000L);
+		sleep(stimer_duration);
 	}
 	return EXIT_SUCCESS; /* - not reached, but gcc 4.2.1 is too dumb! */
 }
