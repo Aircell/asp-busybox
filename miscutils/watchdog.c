@@ -36,7 +36,7 @@ static void watchdog_shutdown(int sig)
 	else
 		x = 1;
 	sync();
-	sleep(5);
+	usleep(100 * 1000);
 	ioctl_or_warn(3, WDIOC_SETTIMEOUT, &x);
 	//write(3, &V, 1);  /* Magic, see watchdog-api.txt in kernel */
 	if (ENABLE_FEATURE_CLEAN_UP)
