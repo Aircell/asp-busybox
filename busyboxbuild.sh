@@ -17,7 +17,8 @@ fi
 export PATH+=:$tools
 
 # cleanliness is next to godliness
-git clean -dfx
+# - But here is the exception that proves the rule.
+#git clean -dfx
 
 # The next commands are pulled right from the INSTALL instructions.
 make defconfig
